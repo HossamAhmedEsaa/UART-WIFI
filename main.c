@@ -45,6 +45,7 @@ void UARTIntHandler(void)
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
         SysCtlDelay(SysCtlClockGet() / (1000 * 3));
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
+        SysCtlDelay(SysCtlClockGet() / (1000 * 3));
     }
     words[i+1]='\0';
     UARTprintf("%s\n",words);
