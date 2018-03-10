@@ -6,6 +6,7 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/debug.h"
@@ -65,6 +66,8 @@ UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
 
 int main(void)
 {
+    char* string="AT\r\n";
+
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
@@ -81,7 +84,7 @@ int main(void)
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
     UARTprintf("hello world ! \n");
-    UARTSend((uint8_t *)"AT\r\n",5);
+    UARTSend((uint8_t *)(string),strlen(string));
     while(1)
     {
 
