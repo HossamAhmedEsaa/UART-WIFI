@@ -66,7 +66,7 @@ UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
 
 int main(void)
 {
-    char* string="AT\r\n";
+    char* string="AT+GMR\r\n";
 
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
