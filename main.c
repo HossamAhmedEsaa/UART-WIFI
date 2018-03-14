@@ -39,14 +39,8 @@ void UARTIntHandler(void)
     UARTIntClear(UART1_BASE, ui32Status);
     while(UARTCharsAvail(UART1_BASE)&&i<100)
     {
-        //words[i]=UARTCharGetNonBlocking(UART1_BASE);
-        words[i]=UARTCharGet(UART1_BASE);
+        words[i]=UARTCharGetNonBlocking(UART1_BASE);
         i++;
-/*
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
-        SysCtlDelay(SysCtlClockGet() / (1000 * 3));
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
-        SysCtlDelay(SysCtlClockGet() / (1000 * 3));*/
     }
     words[i+1]='\0';
     UARTprintf("%s\n",words);
@@ -54,18 +48,10 @@ void UARTIntHandler(void)
 
 UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
 {
-    //
-    // Loop while there are more characters to send.
-    //
     while(ui32Count--)
     {
-        //
-        // Write the next character to the UART.
-        //
-        //UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
-        UARTCharPut(UART1_BASE, *pui8Buffer++);
-        //SysCtlDelay(SysCtlClockGet() /30);
-    }//SysCtlDelay(SysCtlClockGet() /30);
+        UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
+    }
 }
 
 int main(void)
