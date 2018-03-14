@@ -39,13 +39,14 @@ void UARTIntHandler(void)
     UARTIntClear(UART1_BASE, ui32Status);
     while(UARTCharsAvail(UART1_BASE)&&i<100)
     {
-        words[i]=UARTCharGetNonBlocking(UART1_BASE);
+        //words[i]=UARTCharGetNonBlocking(UART1_BASE);
+        words[i]=UARTCharGet(UART1_BASE);
         i++;
-
+/*
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
         SysCtlDelay(SysCtlClockGet() / (1000 * 3));
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
-        SysCtlDelay(SysCtlClockGet() / (1000 * 3));
+        SysCtlDelay(SysCtlClockGet() / (1000 * 3));*/
     }
     words[i+1]='\0';
     UARTprintf("%s\n",words);
@@ -61,8 +62,10 @@ UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
         //
         // Write the next character to the UART.
         //
-        UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
-    }
+        //UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
+        UARTCharPut(UART1_BASE, *pui8Buffer++);
+        //SysCtlDelay(SysCtlClockGet() /30);
+    }//SysCtlDelay(SysCtlClockGet() /30);
 }
 
 int main(void)
@@ -73,7 +76,7 @@ int main(void)
     FPUEnable();
     FPULazyStackingEnable();
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2|GPIO_PIN_1);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
     IntMasterEnable();
@@ -85,10 +88,14 @@ int main(void)
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
     UARTprintf("hello world ! \n");
+    //string="AT\r\n";
     UARTSend((uint8_t *)(string),strlen(string));
     while(1)
     {
-
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+        SysCtlDelay(SysCtlClockGet() / 3);
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
+        SysCtlDelay(SysCtlClockGet() /3);
     }
 }
 
