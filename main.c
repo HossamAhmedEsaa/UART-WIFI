@@ -46,13 +46,15 @@ void UARTIntHandler(void)
     UARTprintf("%s",words);
 }
 
-UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
+void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
 {
     while(ui32Count--)
     {
         UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
     }
 }
+
+//void
 
 int main(void)
 {
