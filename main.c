@@ -41,14 +41,14 @@ void UARTIntHandler(void)
     while(UARTCharsAvail(UART1_BASE)&&i<100)
     {
         words[i]=UARTCharGetNonBlocking(UART1_BASE);
-        if(words[i]=='$')
+        /*if(words[i]=='$')
         {
             j=i;
-        }
+        }*/
         i++;
     }
     words[i+1]='\0';
-    m=i+1;
+    /*m=i+1;
     if(j!=0)
     {
         for (k=j;k<m;k++)
@@ -58,8 +58,24 @@ void UARTIntHandler(void)
         }
         Commands[n+1]='\0';
         UARTprintf("%s",Commands);
-    }
+    }*/
     UARTprintf("%s",words);
+    m=i+1;
+    for (i=0;i<m;i++)
+    {
+        if(words[i]=='$')
+            j=i;
+    }
+        if(j!=0)
+        {
+            for (k=j;k<m;k++)
+            {
+                Commands[n]=words[k];
+                n++;
+            }
+            Commands[n+1]='\0';
+            UARTprintf("\nCommands: %s",Commands);
+        }
 }
 
 void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
