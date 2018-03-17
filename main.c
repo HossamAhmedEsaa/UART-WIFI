@@ -18,7 +18,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-
+char Commands[100]={0};
 void ConfigureUART0(void)
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -34,8 +34,10 @@ void UARTIntHandler(void)
 {
     uint32_t ui32Status;
     char words[100]={0};
-    char Commands[100]={0};
-    int i=0,j=0,k=0,m=0,n=0;
+    //char* a;
+    //char Commands[100]={0};
+    //int i=0,j=0,k=0,m=0,n=0;
+    int i=0;
     ui32Status = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, ui32Status);
     while(UARTCharsAvail(UART1_BASE)&&i<100)
@@ -45,7 +47,9 @@ void UARTIntHandler(void)
     }
     words[i+1]='\0';
     UARTprintf("%s",words);
-    m=i+2;
+    //strcpy(Commands,words);
+
+    /*m=i+2;
     for (i=0;i<=m;i++)
     {
         if(words[i]=='$')
@@ -60,7 +64,7 @@ void UARTIntHandler(void)
             }
             Commands[n+1]='\0';
             //UARTprintf("\nCommands: %s",Commands);
-        }
+        }*/
 }
 
 void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
