@@ -41,40 +41,25 @@ void UARTIntHandler(void)
     while(UARTCharsAvail(UART1_BASE)&&i<100)
     {
         words[i]=UARTCharGetNonBlocking(UART1_BASE);
-        /*if(words[i]=='$')
-        {
-            j=i;
-        }*/
         i++;
     }
     words[i+1]='\0';
-    /*m=i+1;
-    if(j!=0)
-    {
-        for (k=j;k<m;k++)
-        {
-            Commands[n]=words[k];
-            n++;
-        }
-        Commands[n+1]='\0';
-        UARTprintf("%s",Commands);
-    }*/
     UARTprintf("%s",words);
-    m=i+1;
-    for (i=0;i<m;i++)
+    m=i+2;
+    for (i=0;i<=m;i++)
     {
         if(words[i]=='$')
             j=i;
     }
         if(j!=0)
         {
-            for (k=j;k<m;k++)
+            for (k=j;k<=m;k++)
             {
                 Commands[n]=words[k];
                 n++;
             }
             Commands[n+1]='\0';
-            UARTprintf("\nCommands: %s",Commands);
+            //UARTprintf("\nCommands: %s",Commands);
         }
 }
 
@@ -109,7 +94,6 @@ int main(void)
     UARTprintf("hello world ! \n");
     string="AT+CIPMUX=1\r\n";
     UARTSend((uint8_t *)(string),strlen(string));
-    //SysCtlDelay(SysCtlClockGet()/30);//make sure the output is correct,delay some time
     string="AT+CIPSERVER=1,6666\r\n";
     UARTSend((uint8_t *)(string),strlen(string));
     while(1)
