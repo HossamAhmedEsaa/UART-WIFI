@@ -79,7 +79,7 @@ void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
 int main(void)
 {
     char* string="AT\r\n";
-
+    char* words="zzp\r\n";
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
@@ -96,16 +96,26 @@ int main(void)
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
     UARTprintf("hello world ! \n");
-    string="AT+CIPMUX=1\r\n";
+    //string="AT+RST\r\n";
+    //SysCtlDelay(SysCtlClockGet()/3);
+    //UARTSend((uint8_t *)(string),strlen(string));
+    string="AT+CIPSTART=\"TCP\",\"192.168.137.64\",6666\r\n";//CONNECT TO SERVER
     UARTSend((uint8_t *)(string),strlen(string));
-    string="AT+CIPSERVER=1,6666\r\n";
+    //string="AT+CIPMODE=0\r\n";//
+    //UARTSend((uint8_t *)(string),strlen(string));
+    string="AT+CIPMODE=1\r\n";//UART->WIFI
     UARTSend((uint8_t *)(string),strlen(string));
+    string="AT+CIPSEND\r\n";//START
+    UARTSend((uint8_t *)(string),strlen(string));
+    SysCtlDelay(SysCtlClockGet() /3);
+    //UARTSend((uint8_t *)(words),strlen(string));
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
         SysCtlDelay(SysCtlClockGet() / 3);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /3);
+        //UARTSend((uint8_t *)(words),strlen(string));
     }
 }
 
