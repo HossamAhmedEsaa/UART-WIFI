@@ -123,9 +123,9 @@ int main(void)
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
-        SysCtlDelay(SysCtlClockGet() / 3);
+        SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
-        SysCtlDelay(SysCtlClockGet() /3);
+        SysCtlDelay(SysCtlClockGet() /6);
         UARTSend((uint8_t *)(words),strlen(string));
     }
 }
