@@ -76,6 +76,15 @@ void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
+void UARTSend2(const uint8_t *pui8Buffer, uint32_t ui32Count)
+{
+    while(ui32Count--)
+    {
+        UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
+        //SysCtlDelay(SysCtlClockGet()/300);//make sure UART work smoothly,delay some time
+    }
+}
+
 int main(void)
 {
     char* string="AT\r\n";
@@ -99,23 +108,25 @@ int main(void)
     //string="AT+RST\r\n";
     //SysCtlDelay(SysCtlClockGet()/3);
     //UARTSend((uint8_t *)(string),strlen(string));
-    string="AT+CIPSTART=\"TCP\",\"192.168.137.64\",6666\r\n";//CONNECT TO SERVER
-    UARTSend((uint8_t *)(string),strlen(string));
+    //string="AT+CIPSTART=\"TCP\",\"192.168.137.64\",6666\r\n";//CONNECT TO SERVER
+    //UARTSend((uint8_t *)(string),strlen(string));
     //string="AT+CIPMODE=0\r\n";//
     //UARTSend((uint8_t *)(string),strlen(string));
-    string="AT+CIPMODE=1\r\n";//UART->WIFI
-    UARTSend((uint8_t *)(string),strlen(string));
-    string="AT+CIPSEND\r\n";//START
-    UARTSend((uint8_t *)(string),strlen(string));
-    SysCtlDelay(SysCtlClockGet() /3);
-    //UARTSend((uint8_t *)(words),strlen(string));
+    //string="AT+CIPMODE=1\r\n";//UART->WIFI
+   // UARTSend((uint8_t *)(string),strlen(string));
+    //string="AT+CIPSEND\r\n";//START
+    //UARTSend((uint8_t *)(string),strlen(string));
+    //SysCtlDelay(SysCtlClockGet() /3);
+    //UARTSend2((uint8_t *)(words),strlen(string));
+    //words="+++";
+    //UARTSend2((uint8_t *)(words),strlen(string));
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
         SysCtlDelay(SysCtlClockGet() / 3);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /3);
-        //UARTSend((uint8_t *)(words),strlen(string));
+        UARTSend((uint8_t *)(words),strlen(string));
     }
 }
 
