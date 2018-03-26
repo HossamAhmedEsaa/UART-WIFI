@@ -19,6 +19,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 char Commands[100]={0};
+char channel='0';
 void ConfigureUART0(void)
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -34,10 +35,8 @@ void UARTIntHandler(void)
 {
     uint32_t ui32Status;
     char words[100]={0};
-    //char* a;
-    //char Commands[100]={0};
-    //int i=0,j=0,k=0,m=0,n=0;
     int i=0;
+    int j=0;
     ui32Status = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, ui32Status);
     while(UARTCharsAvail(UART1_BASE)&&i<100)
@@ -47,24 +46,11 @@ void UARTIntHandler(void)
     }
     words[i+1]='\0';
     UARTprintf("%s",words);
-    //strcpy(Commands,words);
-
-    /*m=i+2;
-    for (i=0;i<=m;i++)
+    for (j=0;j<100&&words[j]!='\0';j++)//get the current channel
     {
-        if(words[i]=='$')
-            j=i;
+        if(words[j]=='I'&&words[j+1]=='P'&&words[j+2]=='D'&&words[j+3]==',')
+            channel=words[j+4];
     }
-        if(j!=0)
-        {
-            for (k=j;k<=m;k++)
-            {
-                Commands[n]=words[k];
-                n++;
-            }
-            Commands[n+1]='\0';
-            //UARTprintf("\nCommands: %s",Commands);
-        }*/
 }
 
 void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
@@ -76,19 +62,9 @@ void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
-void UARTSend2(const uint8_t *pui8Buffer, uint32_t ui32Count)
-{
-    while(ui32Count--)
-    {
-        UARTCharPutNonBlocking(UART1_BASE, *pui8Buffer++);
-        //SysCtlDelay(SysCtlClockGet()/300);//make sure UART work smoothly,delay some time
-    }
-}
-
 int main(void)
 {
     char* string="AT\r\n";
-    char* words="zzp\r\n";
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
@@ -105,28 +81,17 @@ int main(void)
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
     UARTprintf("hello world ! \n");
-    //string="AT+RST\r\n";
-    //SysCtlDelay(SysCtlClockGet()/3);
-    //UARTSend((uint8_t *)(string),strlen(string));
-    //string="AT+CIPSTART=\"TCP\",\"192.168.137.64\",6666\r\n";//CONNECT TO SERVER
-    //UARTSend((uint8_t *)(string),strlen(string));
-    //string="AT+CIPMODE=0\r\n";//
-    //UARTSend((uint8_t *)(string),strlen(string));
-    //string="AT+CIPMODE=1\r\n";//UART->WIFI
-   // UARTSend((uint8_t *)(string),strlen(string));
-    //string="AT+CIPSEND\r\n";//START
-    //UARTSend((uint8_t *)(string),strlen(string));
-    //SysCtlDelay(SysCtlClockGet() /3);
-    //UARTSend2((uint8_t *)(words),strlen(string));
-    //words="+++";
-    //UARTSend2((uint8_t *)(words),strlen(string));
+    string="AT+CIPMUX=1\r\n";
+    UARTSend((uint8_t *)(string),strlen(string));
+    string="AT+CIPSERVER=1,6666\r\n";
+    UARTSend((uint8_t *)(string),strlen(string));
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
         SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
-        UARTSend((uint8_t *)(words),strlen(string));
+        UARTprintf("%c",channel);
     }
 }
 
