@@ -4,6 +4,7 @@
  *  Created on: Mar 7, 2018
  *      Author: zzp
  */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -62,6 +63,13 @@ void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
+void WIFISend(void)
+{
+    char* strings="AT+CIPSEND=0,12\r\n";
+    UARTSend((uint8_t *)(strings),strlen(strings));
+    //strings=*pui8Buffer;
+}
+
 int main(void)
 {
     char* string="AT\r\n";
@@ -85,13 +93,14 @@ int main(void)
     UARTSend((uint8_t *)(string),strlen(string));
     string="AT+CIPSERVER=1,6666\r\n";
     UARTSend((uint8_t *)(string),strlen(string));
+    WIFISend();
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
         SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
-        UARTprintf("%c",channel);
+        //UARTprintf("%c",channel);
     }
 }
 
