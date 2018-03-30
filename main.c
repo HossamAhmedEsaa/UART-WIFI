@@ -33,39 +33,24 @@ void ConfigureUART0(void)
 }
 
 void UARTIntHandler(void)
-{char get='0';
+{
+    char get='0';
     uint32_t ui32Status;
     char words[100]={0};
     int i;
-    //int j=0;
     ui32Status = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, ui32Status);
-    /*while(UARTCharsAvail(UART1_BASE)&&i<100)
-    {
-        words[i]=UARTCharGetNonBlocking(UART1_BASE);
-        i++;
-    }
-    words[i+1]='\0';
-    UARTprintf("%s",words);
-    for (j=0;j<100&&words[j]!='\0';j++)//get the current channel
-    {
-        if(words[j]=='I'&&words[j+1]=='P'&&words[j+2]=='D'&&words[j+3]==',')
-            channel=words[j+4];
-    }*/
     while(UARTCharsAvail(UART1_BASE))
     {
         if(UARTCharGetNonBlocking(UART1_BASE)=='$')
         {
-            //UARTprintf("yes");
             i=0;
             get=UARTCharGetNonBlocking(UART1_BASE);
             while(get!='#')
             {
-                //UARTprintf("%d",i);
                 words[i]=get;
                 get=UARTCharGetNonBlocking(UART1_BASE);
                 i++;
-                //UARTprintf("%c",get);
             }
             words[i+1]='\0';
             UARTprintf("%s",words);
@@ -87,7 +72,7 @@ void WIFISend(void)
 {
     char* strings="AT+CIPSEND=0,12\r\n";
     UARTSend((uint8_t *)(strings),strlen(strings));
-    //strings=*pui8Buffer;
+    strings="test";
 }
 
 int main(void)
