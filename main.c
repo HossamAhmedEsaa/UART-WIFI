@@ -33,14 +33,14 @@ void ConfigureUART0(void)
 }
 
 void UARTIntHandler(void)
-{
+{char get='0';
     uint32_t ui32Status;
     char words[100]={0};
-    int i=0;
-    int j=0;
+    int i;
+    //int j=0;
     ui32Status = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, ui32Status);
-    while(UARTCharsAvail(UART1_BASE)&&i<100)
+    /*while(UARTCharsAvail(UART1_BASE)&&i<100)
     {
         words[i]=UARTCharGetNonBlocking(UART1_BASE);
         i++;
@@ -51,6 +51,26 @@ void UARTIntHandler(void)
     {
         if(words[j]=='I'&&words[j+1]=='P'&&words[j+2]=='D'&&words[j+3]==',')
             channel=words[j+4];
+    }*/
+    while(UARTCharsAvail(UART1_BASE))
+    {
+        if(UARTCharGetNonBlocking(UART1_BASE)=='$')
+        {
+            //UARTprintf("yes");
+            i=0;
+            get=UARTCharGetNonBlocking(UART1_BASE);
+            while(get!='#')
+            {
+                //UARTprintf("%d",i);
+                words[i]=get;
+                get=UARTCharGetNonBlocking(UART1_BASE);
+                i++;
+                //UARTprintf("%c",get);
+            }
+            words[i+1]='\0';
+            UARTprintf("%s",words);
+            strcpy(Commands,words);
+        }
     }
 }
 
@@ -93,14 +113,14 @@ int main(void)
     UARTSend((uint8_t *)(string),strlen(string));
     string="AT+CIPSERVER=1,6666\r\n";
     UARTSend((uint8_t *)(string),strlen(string));
-    WIFISend();
+    //WIFISend();
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
         SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
-        //UARTprintf("%c",channel);
+        UARTprintf("%s",Commands);
     }
 }
 
