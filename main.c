@@ -42,7 +42,8 @@ void UARTIntHandler(void)
     UARTIntClear(UART1_BASE, ui32Status);
     while(UARTCharsAvail(UART1_BASE))
     {
-        if(UARTCharGetNonBlocking(UART1_BASE)=='$')
+        get=UARTCharGetNonBlocking(UART1_BASE);
+        /*if(get=='$')
         {
             i=0;
             get=UARTCharGetNonBlocking(UART1_BASE);
@@ -53,9 +54,22 @@ void UARTIntHandler(void)
                 i++;
             }
             words[i+1]='\0';
-            UARTprintf("%s",words);
+            //UARTprintf("%s",words);
             strcpy(Commands,words);
         }
+        else
+        {*/
+            UARTprintf("%c",get);
+            /*if(get=='+')
+            {
+                UARTCharGetNonBlocking(UART1_BASE);
+                UARTCharGetNonBlocking(UART1_BASE);
+                UARTCharGetNonBlocking(UART1_BASE);
+                UARTCharGetNonBlocking(UART1_BASE);
+                channel=UARTCharGetNonBlocking(UART1_BASE);
+            }*/
+
+        //}
     }
 }
 
@@ -73,6 +87,7 @@ void WIFISend(void)
     char* strings="AT+CIPSEND=0,12\r\n";
     UARTSend((uint8_t *)(strings),strlen(strings));
     strings="test";
+    UARTSend((uint8_t *)(strings),strlen(strings));
 }
 
 int main(void)
@@ -98,14 +113,18 @@ int main(void)
     UARTSend((uint8_t *)(string),strlen(string));
     string="AT+CIPSERVER=1,6666\r\n";
     UARTSend((uint8_t *)(string),strlen(string));
-    //WIFISend();
+    string="AT+CIPSEND=0,12\r\n";
+    UARTSend((uint8_t *)(string),strlen(string));
+    string="test\r\n";
+    UARTSend((uint8_t *)(string),strlen(string));
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
         SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
-        UARTprintf("%s",Commands);
+        //UARTprintf("%c",channel);
+        //WIFISend();
     }
 }
 
