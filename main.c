@@ -32,7 +32,12 @@ void ConfigureUART0(void)
 
 void ConfigureUART1(void)
 {
-
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+	GPIOPinConfigure(GPIO_PC4_U1RX);
+    GPIOPinConfigure(GPIO_PC5_U1TX);
+    GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_4|GPIO_PIN_5);
+    UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
 }
 
 void UARTIntHandler(void)
@@ -68,13 +73,13 @@ int main(void)
     FPULazyStackingEnable();
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2|GPIO_PIN_1);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    //SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
     IntMasterEnable();
-    GPIOPinConfigure(GPIO_PC4_U1RX);
-    GPIOPinConfigure(GPIO_PC5_U1TX);
-    GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_4|GPIO_PIN_5);
-    UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
+    //GPIOPinConfigure(GPIO_PC4_U1RX);
+    //GPIOPinConfigure(GPIO_PC5_U1TX);
+    //GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_4|GPIO_PIN_5);
+    //UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
     IntEnable(INT_UART1);
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
