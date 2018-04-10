@@ -43,7 +43,7 @@ void UARTIntHandler(void)
         i++;
     }
     words[i+1]='\0';
-    UARTprintf("%s",words);
+    strcpy(Commands,words);
 }
 
 void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
