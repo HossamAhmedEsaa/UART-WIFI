@@ -54,6 +54,7 @@ void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
+
 int main(void)
 {
     char* string="zzpw2\r\n";
@@ -80,6 +81,7 @@ int main(void)
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
         UARTSend((uint8_t *)(string),strlen(string));
+        //UARTprintf("%s",Commands);
     }
 }
 
