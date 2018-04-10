@@ -30,6 +30,11 @@ void ConfigureUART0(void)
     UARTStdioConfig(0,115200,16000000);
 }
 
+void ConfigureUART1(void)
+{
+
+}
+
 void UARTIntHandler(void)
 {
     uint32_t ui32Status;
