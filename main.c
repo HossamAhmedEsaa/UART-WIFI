@@ -80,6 +80,7 @@ int main(void)
     //GPIOPinConfigure(GPIO_PC5_U1TX);
     //GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_4|GPIO_PIN_5);
     //UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
+    ConfigureUART1();
     IntEnable(INT_UART1);
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
@@ -90,7 +91,7 @@ int main(void)
         SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
-        UARTSend((uint8_t *)(string),strlen(string));
+        //UARTSend((uint8_t *)(string),strlen(string));
         //UARTprintf("%s",Commands);
     }
 }
