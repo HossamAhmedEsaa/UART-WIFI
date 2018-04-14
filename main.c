@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include "inc/hw_types.h"
+#include "inc/hw_gpio.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/debug.h"
@@ -40,7 +42,7 @@ void ConfigureUART1(void)
     UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
 }
 
-void UARTIntHandler(void)
+void UART1IntHandler(void)
 {
     uint32_t ui32Status;
     char words[100]={0};
@@ -56,7 +58,22 @@ void UARTIntHandler(void)
     strcpy(Commands,words);
 }
 
-void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
+void UART2IntHandler(void)
+{
+    uint32_t ui32Status;
+    char words[100]={0};
+    int i=0;
+    ui32Status = UARTIntStatus(UART2_BASE, true);
+    UARTIntClear(UART2_BASE, ui32Status);
+    while(UARTCharsAvail(UART2_BASE)&&i<100)
+    {
+        words[i]=UARTCharGetNonBlocking(UART2_BASE);
+        i++;
+    }
+    words[i+1]='\0';
+}
+
+void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 {
     while(ui32Count--)
     {
@@ -83,6 +100,16 @@ int main(void)
     ConfigureUART1();
     IntEnable(INT_UART1);
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART2);
+    GPIOPinConfigure(GPIO_PD6_U2RX);
+    GPIOPinConfigure(GPIO_PD7_U2TX);
+    GPIOPinTypeUART(GPIO_PORTD_BASE,GPIO_PIN_6|GPIO_PIN_7);
+    UARTConfigSetExpClk(UART2_BASE, SysCtlClockGet(), 9600,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
+    HWREG(GPIO_PORTD_BASE+GPIO_O_LOCK) = GPIO_LOCK_KEY;
+    HWREG(GPIO_PORTD_BASE+GPIO_O_CR) |= GPIO_PIN_7;
+    IntEnable(INT_UART2);
+    UARTIntEnable(UART2_BASE, UART_INT_RX | UART_INT_RT);
     ConfigureUART0();
     UARTprintf("hello world ! \n");
     while(1)
@@ -91,7 +118,7 @@ int main(void)
         SysCtlDelay(SysCtlClockGet() / 6);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
-        //UARTSend((uint8_t *)(string),strlen(string));
+        UART1Send((uint8_t *)(string),strlen(string));
         //UARTprintf("%s",Commands);
     }
 }
