@@ -40,6 +40,22 @@ void ConfigureUART1(void)
     GPIOPinConfigure(GPIO_PC5_U1TX);
     GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_4|GPIO_PIN_5);
     UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
+    IntEnable(INT_UART1);
+    UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
+}
+
+void ConfigureUART2(void)
+{
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART2);
+    GPIOPinConfigure(GPIO_PD6_U2RX);
+    GPIOPinConfigure(GPIO_PD7_U2TX);
+    GPIOPinTypeUART(GPIO_PORTD_BASE,GPIO_PIN_6|GPIO_PIN_7);
+    UARTConfigSetExpClk(UART2_BASE, SysCtlClockGet(), 9600,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
+    HWREG(GPIO_PORTD_BASE+GPIO_O_LOCK) = GPIO_LOCK_KEY;
+    HWREG(GPIO_PORTD_BASE+GPIO_O_CR) |= GPIO_PIN_7;
+    IntEnable(INT_UART2);
+    UARTIntEnable(UART2_BASE, UART_INT_RX | UART_INT_RT);
 }
 
 void UART1IntHandler(void)
@@ -81,37 +97,37 @@ void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
+void UART2Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
+{
+    while(ui32Count--)
+    {
+        UARTCharPutNonBlocking(UART2_BASE, *pui8Buffer++);
+    }
+}
+
+void UART2EndSend(void)
+{
+    char *stringend;
+    stringend="\xff\xff\xff";
+    UART2Send((uint8_t *)(stringend),strlen(stringend));
+}
 
 int main(void)
 {
     char* string="zzpw2\r\n";
+    char* string1="page 0\xff\xff\xff";
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2|GPIO_PIN_1);
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
     IntMasterEnable();
-    //GPIOPinConfigure(GPIO_PC4_U1RX);
-    //GPIOPinConfigure(GPIO_PC5_U1TX);
-    //GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_4|GPIO_PIN_5);
-    //UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
     ConfigureUART1();
-    IntEnable(INT_UART1);
-    UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART2);
-    GPIOPinConfigure(GPIO_PD6_U2RX);
-    GPIOPinConfigure(GPIO_PD7_U2TX);
-    GPIOPinTypeUART(GPIO_PORTD_BASE,GPIO_PIN_6|GPIO_PIN_7);
-    UARTConfigSetExpClk(UART2_BASE, SysCtlClockGet(), 9600,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
-    HWREG(GPIO_PORTD_BASE+GPIO_O_LOCK) = GPIO_LOCK_KEY;
-    HWREG(GPIO_PORTD_BASE+GPIO_O_CR) |= GPIO_PIN_7;
-    IntEnable(INT_UART2);
-    UARTIntEnable(UART2_BASE, UART_INT_RX | UART_INT_RT);
+    ConfigureUART2();
     ConfigureUART0();
     UARTprintf("hello world ! \n");
+    UART2Send((uint8_t *)(string1),strlen(string1)-1);
+    //UART2EndSend();
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
