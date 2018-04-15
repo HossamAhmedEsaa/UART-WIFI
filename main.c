@@ -104,19 +104,12 @@ void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
     count=strlen(stringend);
     while(ui32Count--)
     {
-        UARTCharPut(UART3_BASE, *pui8Buffer++);
+        UARTCharPutNonBlocking(UART3_BASE, *pui8Buffer++);
     }
     while(count--)
     {
-        UARTCharPut(UART3_BASE, *stringend++);
+        UARTCharPutNonBlocking(UART3_BASE, *stringend++);
     }
-}
-
-void UART3EndSend(void)
-{
-    char *stringend;
-    stringend="\xff\xff\xff";
-    UART3Send((uint8_t *)(stringend),strlen(stringend));
 }
 
 int main(void)
