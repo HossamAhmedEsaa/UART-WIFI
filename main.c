@@ -44,18 +44,18 @@ void ConfigureUART1(void)
     UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT);
 }
 
-void ConfigureUART2(void)
+void ConfigureUART3(void)
 {
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART2);
-    GPIOPinConfigure(GPIO_PD6_U2RX);
-    GPIOPinConfigure(GPIO_PD7_U2TX);
-    GPIOPinTypeUART(GPIO_PORTD_BASE,GPIO_PIN_6|GPIO_PIN_7);
-    UARTConfigSetExpClk(UART2_BASE, SysCtlClockGet(), 9600,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
-    HWREG(GPIO_PORTD_BASE+GPIO_O_LOCK) = GPIO_LOCK_KEY;
-    HWREG(GPIO_PORTD_BASE+GPIO_O_CR) |= GPIO_PIN_7;
-    IntEnable(INT_UART2);
-    UARTIntEnable(UART2_BASE, UART_INT_RX | UART_INT_RT);
+    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIO);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART3);
+    GPIOPinConfigure(GPIO_PC6_U3RX);
+    GPIOPinConfigure(GPIO_PC7_U3TX);
+    GPIOPinTypeUART(GPIO_PORTC_BASE,GPIO_PIN_6|GPIO_PIN_7);
+    UARTConfigSetExpClk(UART3_BASE, SysCtlClockGet(), 9600,(UART_CONFIG_WLEN_8|UART_CONFIG_STOP_ONE|UART_CONFIG_PAR_NONE));
+    //HWREG(GPIO_PORTD_BASE+GPIO_O_LOCK) = GPIO_LOCK_KEY;
+    //HWREG(GPIO_PORTD_BASE+GPIO_O_CR) |= GPIO_PIN_7;
+    IntEnable(INT_UART3);
+    UARTIntEnable(UART3_BASE, UART_INT_RX | UART_INT_RT);
 }
 
 void UART1IntHandler(void)
@@ -74,16 +74,16 @@ void UART1IntHandler(void)
     strcpy(Commands,words);
 }
 
-void UART2IntHandler(void)
+void UART3IntHandler(void)
 {
     uint32_t ui32Status;
     char words[100]={0};
     int i=0;
-    ui32Status = UARTIntStatus(UART2_BASE, true);
-    UARTIntClear(UART2_BASE, ui32Status);
-    while(UARTCharsAvail(UART2_BASE)&&i<100)
+    ui32Status = UARTIntStatus(UART3_BASE, true);
+    UARTIntClear(UART3_BASE, ui32Status);
+    while(UARTCharsAvail(UART3_BASE)&&i<100)
     {
-        words[i]=UARTCharGetNonBlocking(UART2_BASE);
+        words[i]=UARTCharGetNonBlocking(UART3_BASE);
         i++;
     }
     words[i+1]='\0';
@@ -97,25 +97,26 @@ void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
-void UART2Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
+void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 {
     while(ui32Count--)
     {
-        UARTCharPutNonBlocking(UART2_BASE, *pui8Buffer++);
+        UARTCharPut(UART3_BASE, *pui8Buffer++);
     }
 }
 
-void UART2EndSend(void)
+void UART3EndSend(void)
 {
     char *stringend;
     stringend="\xff\xff\xff";
-    UART2Send((uint8_t *)(stringend),strlen(stringend));
+    UART3Send((uint8_t *)(stringend),strlen(stringend));
 }
 
 int main(void)
-{
+{volatile int i;
     char* string="zzpw2\r\n";
-    char* string1="page 0\xff\xff\xff";
+    //char* string1="page 0\xff\xff\xff";
+    volatile char a[7]="page 0";
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
@@ -123,10 +124,10 @@ int main(void)
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2|GPIO_PIN_1);
     IntMasterEnable();
     ConfigureUART1();
-    ConfigureUART2();
+    ConfigureUART3();
     ConfigureUART0();
     UARTprintf("hello world ! \n");
-    UART2Send((uint8_t *)(string1),strlen(string1)-1);
+    //UART2Send((uint8_t *)(string1),strlen(string1)-1);
     //UART2EndSend();
     while(1)
     {
@@ -135,6 +136,12 @@ int main(void)
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
         UART1Send((uint8_t *)(string),strlen(string));
+        for(i=0;a[i]&&a[i]!='\0';i++)
+        {
+            UARTCharPut(UART3_BASE,a[i]);
+
+        }
+        UART3EndSend();
         //UARTprintf("%s",Commands);
     }
 }
