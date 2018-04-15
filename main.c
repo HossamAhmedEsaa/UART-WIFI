@@ -21,6 +21,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 char Commands[100]={0};
+char ButtonGet[100]={0};
 void ConfigureUART0(void)
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
