@@ -99,9 +99,16 @@ void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 
 void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 {
+    char *stringend="\xff\xff\xff";
+    uint32_t count;
+    count=strlen(stringend);
     while(ui32Count--)
     {
         UARTCharPut(UART3_BASE, *pui8Buffer++);
+    }
+    while(count--)
+    {
+        UARTCharPut(UART3_BASE, *stringend++);
     }
 }
 
@@ -115,7 +122,7 @@ void UART3EndSend(void)
 int main(void)
 {volatile int i;
     char* string="zzpw2\r\n";
-    //char* string1="page 0\xff\xff\xff";
+    char* string1="page 0";
     volatile char a[7]="page 0";
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
@@ -127,8 +134,6 @@ int main(void)
     ConfigureUART3();
     ConfigureUART0();
     UARTprintf("hello world ! \n");
-    //UART2Send((uint8_t *)(string1),strlen(string1)-1);
-    //UART2EndSend();
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
@@ -136,12 +141,7 @@ int main(void)
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
         UART1Send((uint8_t *)(string),strlen(string));
-        for(i=0;a[i]&&a[i]!='\0';i++)
-        {
-            UARTCharPut(UART3_BASE,a[i]);
-
-        }
-        UART3EndSend();
+        UART3Send((uint8_t *)(string1),strlen(string1));
         //UARTprintf("%s",Commands);
     }
 }
