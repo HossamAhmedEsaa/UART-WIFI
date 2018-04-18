@@ -22,7 +22,7 @@
 #include "utils/uartstdio.h"
 char Commands[100]={0};
 char ButtonGet[100]={0};
-void ConfigureUART0(void)
+/*void ConfigureUART0(void)
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
@@ -31,7 +31,7 @@ void ConfigureUART0(void)
     GPIOPinTypeUART(GPIO_PORTA_BASE,GPIO_PIN_0|GPIO_PIN_1);
     UARTClockSourceSet(UART0_BASE,UART_CLOCK_PIOSC);
     UARTStdioConfig(0,115200,16000000);
-}
+}*/
 
 void ConfigureUART1(void)
 {
@@ -123,8 +123,8 @@ int main(void)
     IntMasterEnable();
     ConfigureUART1();
     ConfigureUART3();
-    ConfigureUART0();
-    UARTprintf("hello world ! \n");
+    //ConfigureUART0();
+    //UARTprintf("hello world ! \n");
     while(1)
     {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
