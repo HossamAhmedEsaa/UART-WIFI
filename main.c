@@ -54,10 +54,9 @@ void UART1IntHandler(void)
     int i=0;
     ui32Status = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, ui32Status);
-    while(UARTCharsAvail(UART1_BASE)&&i<100)
+    while(UARTCharsAvail(UART1_BASE))
     {
         words[i]=UARTCharGet(UART1_BASE);
-        SysCtlDelay(2);
         i++;
     }
     words[i+1]='\0';
