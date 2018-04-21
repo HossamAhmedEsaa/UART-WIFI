@@ -21,7 +21,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 char Commands[100]={0};
-char ButtonGet[100]={0};
+char ButtonGet='0';
 _Bool data=0;
 
 void ConfigureUART1(void)
@@ -69,16 +69,11 @@ void UART1IntHandler(void)
 void UART3IntHandler(void)
 {
     uint32_t ui32Status;
-    char word[100]={0};
-    int i=0;
+    char word='0';
     ui32Status = UARTIntStatus(UART3_BASE, true);
     UARTIntClear(UART3_BASE, ui32Status);
-    while(UARTCharsAvail(UART3_BASE)&&i<100)
-    {
-        word[i]=UARTCharGet(UART3_BASE);
-        i++;
-    }
-    word[i+1]='\0';
+        word=UARTCharGet(UART3_BASE);
+        ButtonGet=word;
 }
 
 void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
@@ -99,7 +94,6 @@ void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
         UARTCharPut(UART3_BASE, 0xff);
         UARTCharPut(UART3_BASE, 0xff);
         UARTCharPut(UART3_BASE, 0xff);
-
 }
 
 int main(void)
