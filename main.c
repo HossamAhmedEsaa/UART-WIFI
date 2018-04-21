@@ -21,8 +21,10 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 char Commands[100]={0};
-char ButtonGet='0';
+char ButtonGet[1]="0";
 _Bool data=0;
+_Bool cmd=0;
+char shell[10]={0};
 
 void ConfigureUART1(void)
 {
@@ -72,8 +74,9 @@ void UART3IntHandler(void)
     char word='0';
     ui32Status = UARTIntStatus(UART3_BASE, true);
     UARTIntClear(UART3_BASE, ui32Status);
-        word=UARTCharGet(UART3_BASE);
-        ButtonGet=word;
+    word=UARTCharGet(UART3_BASE);
+    ButtonGet[0]=word;
+    cmd=1;
 }
 
 void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
@@ -98,7 +101,7 @@ void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 
 int main(void)
 
-{
+{int i=0;
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
@@ -117,6 +120,15 @@ int main(void)
             strcat(string1,Commands);
             strcat(string1,string2);
             UART3Send((uint8_t *)(string1),strlen(string1));
+        }
+        if(cmd==1)
+        {
+            cmd=0;
+            shell[i]=ButtonGet[0];
+            i++;
+            shell[i]='\0';
+           // char string3[100]={0};
+            UART1Send((uint8_t *)(shell),strlen(shell));
         }
     }
 }
