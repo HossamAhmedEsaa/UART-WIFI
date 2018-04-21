@@ -22,16 +22,7 @@
 #include "utils/uartstdio.h"
 char Commands[100]={0};
 char ButtonGet[100]={0};
-/*void ConfigureUART0(void)
-{
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-    GPIOPinConfigure(GPIO_PA0_U0RX);
-    GPIOPinConfigure(GPIO_PA1_U0TX);
-    GPIOPinTypeUART(GPIO_PORTA_BASE,GPIO_PIN_0|GPIO_PIN_1);
-    UARTClockSourceSet(UART0_BASE,UART_CLOCK_PIOSC);
-    UARTStdioConfig(0,115200,16000000);
-}*/
+_Bool data=0;
 
 void ConfigureUART1(void)
 {
@@ -70,21 +61,22 @@ void UART1IntHandler(void)
     }
     words[i+1]='\0';
     strcpy(Commands,words);
+    data=1;
 }
 
 void UART3IntHandler(void)
 {
     uint32_t ui32Status;
-    char words[100]={0};
+    char word[100]={0};
     int i=0;
     ui32Status = UARTIntStatus(UART3_BASE, true);
     UARTIntClear(UART3_BASE, ui32Status);
     while(UARTCharsAvail(UART3_BASE)&&i<100)
     {
-        words[i]=UARTCharGetNonBlocking(UART3_BASE);
+        word[i]=UARTCharGetNonBlocking(UART3_BASE);
         i++;
     }
-    words[i+1]='\0';
+    word[i+1]='\0';
 }
 
 void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
@@ -111,10 +103,7 @@ void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 }
 
 int main(void)
-{volatile int i;
-    char* string="zzpw2\r\n";
-    char* string1="t0.txt=\"12345\"";
-    volatile char a[7]="page 0";
+{
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
     FPULazyStackingEnable();
@@ -123,17 +112,17 @@ int main(void)
     IntMasterEnable();
     ConfigureUART1();
     ConfigureUART3();
-    //ConfigureUART0();
-    //UARTprintf("hello world ! \n");
     while(1)
     {
-        //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
-        //SysCtlDelay(SysCtlClockGet() / 6);
-        //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
-        SysCtlDelay(SysCtlClockGet() /6);
-        UART1Send((uint8_t *)(string),strlen(string));
-        UART3Send((uint8_t *)(string1),strlen(string1));
-        //UARTprintf("%s",Commands);
+        if(data==1)
+        {
+            data=0;
+            char string1[100]="t0.txt=\"";
+            char string2[5]="\"";
+            strcat(string1,Commands);
+            strcat(string1,string2);
+            UART3Send((uint8_t *)(string1),strlen(string1));
+        }
     }
 }
 
