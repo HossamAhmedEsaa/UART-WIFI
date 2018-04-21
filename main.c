@@ -56,7 +56,8 @@ void UART1IntHandler(void)
     UARTIntClear(UART1_BASE, ui32Status);
     while(UARTCharsAvail(UART1_BASE)&&i<100)
     {
-        words[i]=UARTCharGetNonBlocking(UART1_BASE);
+        words[i]=UARTCharGet(UART1_BASE);
+        SysCtlDelay(2);
         i++;
     }
     words[i+1]='\0';
@@ -73,7 +74,7 @@ void UART3IntHandler(void)
     UARTIntClear(UART3_BASE, ui32Status);
     while(UARTCharsAvail(UART3_BASE)&&i<100)
     {
-        word[i]=UARTCharGetNonBlocking(UART3_BASE);
+        word[i]=UARTCharGet(UART3_BASE);
         i++;
     }
     word[i+1]='\0';
@@ -89,20 +90,19 @@ void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 
 void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 {
-    char *stringend="\xff\xff\xff";
-    uint32_t count;
-    count=strlen(stringend);
     while(ui32Count--)
     {
-        UARTCharPutNonBlocking(UART3_BASE, *pui8Buffer++);
+        UARTCharPut(UART3_BASE, *pui8Buffer++);
     }
-    while(count--)
-    {
-        UARTCharPutNonBlocking(UART3_BASE, *stringend++);
-    }
+
+        UARTCharPut(UART3_BASE, 0xff);
+        UARTCharPut(UART3_BASE, 0xff);
+        UARTCharPut(UART3_BASE, 0xff);
+
 }
 
 int main(void)
+
 {
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
