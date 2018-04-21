@@ -28,7 +28,7 @@ char shell[10]={0};
 
 void ConfigureUART1(void)
 {
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
 	GPIOPinConfigure(GPIO_PC4_U1RX);
 	GPIOPinConfigure(GPIO_PC5_U1TX);
