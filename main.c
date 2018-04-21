@@ -113,7 +113,7 @@ void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
 int main(void)
 {volatile int i;
     char* string="zzpw2\r\n";
-    char* string1="page 0";
+    char* string1="t0.txt=\"12345\"";
     volatile char a[7]="page 0";
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//40mhz
     FPUEnable();
@@ -127,9 +127,9 @@ int main(void)
     //UARTprintf("hello world ! \n");
     while(1)
     {
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
-        SysCtlDelay(SysCtlClockGet() / 6);
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
+        //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+        //SysCtlDelay(SysCtlClockGet() / 6);
+        //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
         SysCtlDelay(SysCtlClockGet() /6);
         UART1Send((uint8_t *)(string),strlen(string));
         UART3Send((uint8_t *)(string1),strlen(string1));
