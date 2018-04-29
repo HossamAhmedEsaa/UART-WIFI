@@ -20,11 +20,11 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-char Commands[100]={0};
-char ButtonGet[1]="0";
-_Bool data=0;
+
+
+char* string;
 _Bool cmd=0;
-char shell[10]={0};
+
 
 void ConfigureUART1(void)
 {
@@ -51,22 +51,6 @@ void ConfigureUART3(void)
     UARTIntEnable(UART3_BASE, UART_INT_RX | UART_INT_RT);
 }
 
-void UART1IntHandler(void)
-{
-    uint32_t ui32Status;
-    char words[100]={0};
-    int i=0;
-    ui32Status = UARTIntStatus(UART1_BASE, true);
-    UARTIntClear(UART1_BASE, ui32Status);
-    while(UARTCharsAvail(UART1_BASE))
-    {
-        words[i]=UARTCharGet(UART1_BASE);
-        i++;
-    }
-    words[i+1]='\0';
-    strcpy(Commands,words);
-    data=1;
-}
 
 void UART3IntHandler(void)
 {
@@ -75,7 +59,14 @@ void UART3IntHandler(void)
     ui32Status = UARTIntStatus(UART3_BASE, true);
     UARTIntClear(UART3_BASE, ui32Status);
     word=UARTCharGet(UART3_BASE);
-    ButtonGet[0]=word;
+    switch(word)
+    {
+    case '0': string="MODE0";break;
+    case '1': string="MODE1";break;
+    case '2': string="MODE2";break;
+    case '3': string="MODE3";break;
+    case '4': string="MODE4";break;
+    }
     cmd=1;
 }
 
@@ -87,17 +78,6 @@ void UART1Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 }
 
-void UART3Send(const uint8_t *pui8Buffer, uint32_t ui32Count)
-{
-    while(ui32Count--)
-    {
-        UARTCharPut(UART3_BASE, *pui8Buffer++);
-    }
-
-        UARTCharPut(UART3_BASE, 0xff);
-        UARTCharPut(UART3_BASE, 0xff);
-        UARTCharPut(UART3_BASE, 0xff);
-}
 
 int main(void)
 
@@ -112,23 +92,10 @@ int main(void)
     ConfigureUART3();
     while(1)
     {
-        if(data==1)
-        {
-            data=0;
-            char string1[100]="t0.txt=\"";
-            char string2[5]="\"";
-            strcat(string1,Commands);
-            strcat(string1,string2);
-            UART3Send((uint8_t *)(string1),strlen(string1));
-        }
         if(cmd==1)
         {
             cmd=0;
-            shell[i]=ButtonGet[0];
-            i++;
-            shell[i]='\0';
-           // char string3[100]={0};
-            UART1Send((uint8_t *)(shell),strlen(shell));
+            UART1Send((uint8_t *)(string),strlen(string));
         }
     }
 }
