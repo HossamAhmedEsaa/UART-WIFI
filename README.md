@@ -5,7 +5,8 @@ a UART-WIFI driver for TM4C123G LaunchPad
 ## Finished picture
 ![finished picture](/img/2115088354.jpg)
 
-##License
+## License
 
 GNU General Public License v3
+
 ![gpl](/img/GPLv3_Logo.png)
