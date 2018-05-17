@@ -66,6 +66,7 @@ void UART3IntHandler(void)
     case '2': string="MODE2";break;
     case '3': string="MODE3";break;
     case '4': string="MODE4";break;
+	case '5': string="MODE5";break;
     }
     cmd=1;
 }
